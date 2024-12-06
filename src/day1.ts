@@ -5,7 +5,7 @@ export function partOne(filePath: string): void {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
   const expected = lines[0];
-  lines = lines.slice(1);
+  lines = lines.slice(2);
   logger.info(
     `Running day 1 part one with ${lines.length} lines and expected ${expected}`
   );
@@ -32,10 +32,26 @@ export function partOne(filePath: string): void {
 export function partTwo(filePath: string): void {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
-  const expected = lines[0];
-  lines = lines.slice(1);
+  const expected = lines[1];
+  lines = lines.slice(2);
   logger.info(
     `Running day 1 part two with ${lines.length} lines and expected ${expected}`
   );
-  // TODO: Implement part two logic
+
+  let lList: number[] = [];
+  let rListCount: Map<number, number> = new Map();
+  lines.forEach((l) => {
+    const nums = l.split("   ").map(Number);
+    lList.push(nums[0]);
+    rListCount.set(nums[1], (rListCount.get(nums[1]) ?? 0) + 1);
+  });
+
+  lList.sort();
+
+  let acc = 0;
+  for (let i = 0; i < lList.length; i++) {
+    acc += Math.abs(lList[i] * (rListCount.get(lList[i]) ?? 0));
+  }
+
+  logger.info({ value: acc, expected: expected }, "Day 1 part two");
 }
