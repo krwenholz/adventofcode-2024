@@ -8,7 +8,11 @@ program
   .command("run")
   .option("-d, --day <DAY>", "Day number to run")
   .option("-p, --part <PART>", "Part number to run: 'one' or 'two'")
-  .option("-i, --input <INPUT>", "Puzzle input file")
+  .option(
+    "-i, --input <INPUT>",
+    "Puzzle input file specifier: e.g. sample or blank",
+    ""
+  )
   .action((options) => {
     logger.info("Running day %s", options.day);
     let partFunc: Function;
@@ -21,8 +25,9 @@ program
       return;
     }
 
-    partFunc(options.input);
+    partFunc(`./inputs/day${options.day}.${options.input}.txt`);
   });
+
 program
   .command("new")
   .option("-d, --day <DAY>", "Day number to create")
