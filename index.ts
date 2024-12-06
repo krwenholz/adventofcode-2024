@@ -25,7 +25,11 @@ program
       return;
     }
 
-    partFunc(`./inputs/day${options.day}.${options.input}.txt`);
+    partFunc(
+      `./inputs/day${options.day}${
+        options.input ? "." + options.input : ""
+      }.txt`
+    );
   });
 
 program
