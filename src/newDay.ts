@@ -10,7 +10,7 @@ export function partOne(filePath: string): void {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\\n");
   const expected = lines[0];
-  lines = lines.slice(1);
+  lines = lines.slice(2);
   logger.info(\`Running day ${dayNumber} part one with \${lines.length} lines and expected \${expected}\`);
 
   // TODO: Implement part one logic
@@ -21,8 +21,8 @@ export function partOne(filePath: string): void {
 export function partTwo(filePath: string): void {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\\n");
-  const expected = lines[0];
-  lines = lines.slice(1);
+  const expected = lines[1];
+  lines = lines.slice(2);
   logger.info(\`Running day ${dayNumber} part two with \${lines.length} lines\ and expected \${expected}\`);
 
   // TODO: Implement part two logic
