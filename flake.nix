@@ -31,7 +31,7 @@
 
             # ... which makes available the following dependencies, 
             # all sourced from the `pkgs` package set:
-            packages = with pkgs; [ nix git ];
+            packages = with pkgs; [ nix git nodejs nodePackages.typescript nodePackages.typescript-language-server bun ];
           };
       });
 }
