@@ -1,5 +1,6 @@
 import * as fs from "fs";
 import { logger } from "./logger";
+import { report } from "process";
 
 export function partOne(filePath: string): void {
   const fileContents = fs.readFileSync(filePath, "utf-8");
@@ -38,6 +39,54 @@ export function partOne(filePath: string): void {
   logger.info({ value: safeCount, expected: expected }, "Day 2 part one");
 }
 
+function reportIsSafe(report: number[]): [boolean, number] {
+  let increasing = report[0] < report[1];
+  for (let i = 0; i < report.length - 1; i++) {
+    let cur = report[i];
+    let next = report[i + 1];
+
+    if (increasing) {
+      let diff = next - cur;
+      if (cur < next && [1, 2, 3].includes(diff)) {
+        continue;
+      }
+    } else {
+      let diff = cur - next;
+      if (cur > next && [1, 2, 3].includes(diff)) {
+        continue;
+      }
+    }
+
+    return [false, i];
+  }
+
+  return [true, -1];
+}
+
+function reportLineIsSafe(l: string): boolean {
+  let levels = l.split(" ").map(Number);
+
+  let [safe, skippedLevel] = reportIsSafe(levels);
+  if (!safe) {
+    let levelsReduced = levels
+      .slice(skippedLevel)
+      .concat(levels.slice(skippedLevel + 1));
+    logger.debug(
+      { levels: levels.join(" "), levelsReduced, skippedLevel },
+      "One unsafe"
+    );
+    [safe, skippedLevel] = reportIsSafe(levelsReduced);
+    if (!safe) {
+      logger.debug({ levels: levels.join(" "), skippedLevel }, "Second unsafe");
+      return false;
+    }
+    return true;
+  }
+
+  logger.debug({ l, skippedLevel }, "Safe");
+  return true;
+}
+
 export function partTwo(filePath: string): void {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
@@ -47,7 +96,12 @@ export function partTwo(filePath: string): void {
     `Running day 2 part two with ${lines.length} lines and expected ${expected}`
   );
 
-  // TODO: Implement part two logic
+  let safeCount = 0;
+  lines.forEach((l) => {
+    if (reportLineIsSafe(l)) {
+      safeCount++;
+    }
+  });
 
-  logger.info({ value: "", expected: expected }, "Day 2 part two");
+  logger.info({ value: safeCount, expected: expected }, "Day 2 part two");
 }
