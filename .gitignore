@@ -1,5 +1,8 @@
 .direnv/
-inputs/
+
+# Allow any puzzle inputs that aren't my full puzzle input
+inputs/*.txt
+!inputs/day*.*.txt
 
 # Based on https://raw.githubusercontent.com/github/gitignore/main/Node.gitignore
 
