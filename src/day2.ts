@@ -2,7 +2,7 @@ import * as fs from "fs";
 import { logger } from "./logger";
 import { report } from "process";
 
-export function partOne(filePath: string): void {
+export function partOne(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
   const expected = lines[0];
@@ -37,6 +37,7 @@ export function partOne(filePath: string): void {
   });
 
   logger.info({ value: safeCount, expected: expected }, "Day 2 part one");
+  return safeCount;
 }
 
 const allowedDiffs = new Set([1, 2, 3]);
@@ -142,7 +143,7 @@ function reportLineIsSafe(l: string): boolean {
   return true;
 }
 
-export function partTwo(filePath: string): void {
+export function partTwo(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
   const expected = lines[1];
@@ -159,4 +160,5 @@ export function partTwo(filePath: string): void {
   });
 
   logger.info({ value: safeCount, expected: expected }, "Day 2 part two");
+  return safeCount;
 }

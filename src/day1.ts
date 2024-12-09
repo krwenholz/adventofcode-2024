@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import { logger } from "./logger";
 
-export function partOne(filePath: string): void {
+export function partOne(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
   const expected = lines[0];
@@ -27,9 +27,10 @@ export function partOne(filePath: string): void {
   }
 
   logger.info({ value: acc, expected: expected }, "Day 1 part one");
+  return acc;
 }
 
-export function partTwo(filePath: string): void {
+export function partTwo(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
   const expected = lines[1];
@@ -54,4 +55,5 @@ export function partTwo(filePath: string): void {
   }
 
   logger.info({ value: acc, expected: expected }, "Day 1 part two");
+  return acc;
 }
