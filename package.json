@@ -3,6 +3,7 @@
   "module": "index.ts",
   "type": "module",
   "scripts": {
+    "newDay": "index.ts",
     "test": "vitest",
     "coverage": "vitest run --coverage"
   },
