@@ -6,6 +6,10 @@ fs.readdirSync("./inputs").forEach((file) => {
     const day = file.match(/day(\d+)/)?.[1];
     const name = file.match(/day\d+\.(\w+)\.txt/)?.[1];
     describe("data driven day tests", () => {
+        if (!name) {
+            test(`skipping ${file}`, () => { });
+            return;
+        }
         const contents = fs.readFileSync("./inputs/" + file).toString().split("\n");
         const partOneExpected = contents[0];
         const partTwoExpected = contents[1];
