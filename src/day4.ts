@@ -67,6 +67,27 @@ export function partOne(filePath: string): number {
   return xmasCount;
 }
 
+function hasXedmas(startRow: number, startCol: number, grid: string[]): boolean {
+  if (getPosition(startRow, startCol, grid) !== "A") {
+    return false;
+  }
+
+  const upperLeft = getPosition(startRow - 1, startCol - 1, grid);
+  const upperRight = getPosition(startRow - 1, startCol + 1, grid);
+  const lowerLeft = getPosition(startRow + 1, startCol - 1, grid);
+  const lowerRight = getPosition(startRow + 1, startCol + 1, grid);
+
+  if (!(upperLeft === "M" && lowerRight === "S") && !(upperLeft === "S" && lowerRight === "M")) {
+    return false;
+  }
+
+  if (!(upperRight === "M" && lowerLeft === "S") && !(upperRight === "S" && lowerLeft === "M")) {
+    return false;
+  }
+
+  return true;
+}
+
 export function partTwo(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, "utf-8");
   let lines = fileContents.split("\n");
@@ -74,8 +95,19 @@ export function partTwo(filePath: string): number {
   lines = lines.slice(2);
   logger.info(`Running day 4 part two with ${lines.length} lines and expected ${expected}`);
 
-  // TODO: Implement part two logic
+  let xedmasCount = 0;
+  for (let row = 0; row < lines.length; row++) {
+    // for every row look for the start of xmas (x)
+    // then for every direction around that x, look for it spelling xmas
+    // traverse along that direction until we get all the letters (either forward or backwards) 
+    // if we hit a non xmas letter, break and try the next direction
+    for (let col = 0; col < lines[row].length; col++) {
+      if (hasXedmas(row, col, lines)) {
+        xedmasCount++;
+      }
+    }
+  }
 
-  logger.info({ value: "", expected: expected }, "Day 4 part two");
-  return NaN;
+  logger.info({ value: xedmasCount, expected: expected }, "Day 4 part two");
+  return xedmasCount;
 }
