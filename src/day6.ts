@@ -186,12 +186,26 @@ export function partTwo(filePath: string): number {
     ) {
       const newGrid = placeBlock(nextRow, nextCol, grid);
       logger.debug({ row, col, dir }, 'Placing a block to cut off the path');
-      const [, isCyclic] = tracePath(
-        row,
-        col,
-        dir,
-        newGrid,
-        new Map<string, Set<string>>(positions),
+      logger.debug(
+        {
+          poss: positions.entries().reduce((acc, [k, v]) => {
+            return `${k}:${[...v.values()].join(',')}, ${acc}`;
+          }, ''),
+        },
+        'positions',
+      );
+      const positionsCopy = new Map<string, Set<string>>();
+      positions.forEach((v, k) => {
+        positionsCopy.set(k, new Set(v));
+      });
+      const [, isCyclic] = tracePath(row, col, dir, newGrid, positionsCopy);
+      logger.debug(
+        {
+          poss: positions.entries().reduce((acc, [k, v]) => {
+            return `${k}:${[...v.values()].join(',')}, ${acc}`;
+          }, ''),
+        },
+        'positions',
       );
       if (isCyclic) {
         logger.debug(
@@ -199,17 +213,7 @@ export function partTwo(filePath: string): number {
           'Cyclic path detected with new block',
         );
         console.log(newGrid.map(line => line.join('')).join('\n'));
-        logger.debug(
-          {
-            poss: positions.entries().reduce((acc, [k, v]) => {
-              return `${k}:${[...v.values()].join(',')}, ${acc}`;
-            }, ''),
-          },
-          'positions',
-        );
         cycleCreatingBlockCount++;
-        //TODO: remove
-        return cycleCreatingBlockCount;
       }
     }
 
@@ -225,16 +229,6 @@ export function partTwo(filePath: string): number {
       const dirs = positions.get(`${row},${col}`) || new Set<string>();
       dirs.add(`${dir}`);
       positions.set(`${row},${col}`, dirs);
-      if (row === 3 && col === 4) {
-        logger.debug(
-          {
-            poss: positions.entries().reduce((acc, [k, v]) => {
-              return `${k}:${[...v.values()].join(',')}, ${acc}`;
-            }, ''),
-          },
-          'positions',
-        );
-      }
     }
   }
 
