@@ -112,17 +112,6 @@ function tracePath(
       const dirs = positions.get(`${row},${col}`) || new Set<string>();
 
       if (dirs.has(`${dir}`)) {
-        logger.debug(
-          {
-            dirs: dirs.values().reduce((acc, v) => {
-              return acc + ',' + v;
-            }, ''),
-            dir,
-            row,
-            col,
-          },
-          'Cyclic path detected',
-        );
         return [positions, true];
       }
 
@@ -186,33 +175,16 @@ export function partTwo(filePath: string): number {
     ) {
       const newGrid = placeBlock(nextRow, nextCol, grid);
       logger.debug({ row, col, dir }, 'Placing a block to cut off the path');
-      logger.debug(
-        {
-          poss: positions.entries().reduce((acc, [k, v]) => {
-            return `${k}:${[...v.values()].join(',')}, ${acc}`;
-          }, ''),
-        },
-        'positions',
-      );
       const positionsCopy = new Map<string, Set<string>>();
       positions.forEach((v, k) => {
         positionsCopy.set(k, new Set(v));
       });
       const [, isCyclic] = tracePath(row, col, dir, newGrid, positionsCopy);
-      logger.debug(
-        {
-          poss: positions.entries().reduce((acc, [k, v]) => {
-            return `${k}:${[...v.values()].join(',')}, ${acc}`;
-          }, ''),
-        },
-        'positions',
-      );
       if (isCyclic) {
         logger.debug(
           { nextRow, nextCol, dir },
           'Cyclic path detected with new block',
         );
-        console.log(newGrid.map(line => line.join('')).join('\n'));
         cycleCreatingBlockCount++;
       }
     }
