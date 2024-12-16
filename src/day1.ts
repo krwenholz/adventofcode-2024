@@ -10,8 +10,8 @@ export function partOne(filePath: string): number {
     `Running day 1 part one with ${lines.length} lines and expected ${expected}`
   );
 
-  let lList: number[] = [];
-  let rList: number[] = [];
+  const lList: number[] = [];
+  const rList: number[] = [];
   lines.forEach((l) => {
     const nums = l.split("   ");
     lList.push(Number(nums[0]));
@@ -39,8 +39,8 @@ export function partTwo(filePath: string): number {
     `Running day 1 part two with ${lines.length} lines and expected ${expected}`
   );
 
-  let lList: number[] = [];
-  let rListCount: Map<number, number> = new Map();
+  const lList: number[] = [];
+  const rListCount: Map<number, number> = new Map();
   lines.forEach((l) => {
     const nums = l.split("   ").map(Number);
     lList.push(nums[0]);

@@ -13,19 +13,19 @@ export function partOne(filePath: string): number {
 
   let safeCount = 0;
   lines.forEach((l) => {
-    let reports = l.split(" ").map(Number);
+    const reports = l.split(" ").map(Number);
 
-    let increasing = reports[0] < reports[1];
+    const increasing = reports[0] < reports[1];
     let safe = true;
     for (let i = 0; i < reports.length - 1; i++) {
-      let cur = reports[i];
-      let next = reports[i + 1];
+      const cur = reports[i];
+      const next = reports[i + 1];
 
       if (increasing) {
-        let diff = next - cur;
+        const diff = next - cur;
         safe = safe && cur < next && [1, 2, 3].includes(diff);
       } else {
-        let diff = cur - next;
+        const diff = cur - next;
         safe = safe && cur > next && [1, 2, 3].includes(diff);
       }
     }
@@ -43,18 +43,18 @@ export function partOne(filePath: string): number {
 const allowedDiffs = new Set([1, 2, 3]);
 
 function reportIsSafe(report: number[]): [boolean, number] {
-  let increasing = report[0] < report[1];
+  const increasing = report[0] < report[1];
   for (let i = 0; i < report.length - 1; i++) {
-    let cur = report[i];
-    let next = report[i + 1];
+    const cur = report[i];
+    const next = report[i + 1];
 
     if (increasing) {
-      let diff = next - cur;
+      const diff = next - cur;
       if (cur < next && allowedDiffs.has(diff)) {
         continue;
       }
     } else {
-      let diff = cur - next;
+      const diff = cur - next;
       if (cur > next && allowedDiffs.has(diff)) {
         continue;
       }
@@ -67,13 +67,13 @@ function reportIsSafe(report: number[]): [boolean, number] {
 }
 
 function reportLineIsSafe(l: string): boolean {
-  let levels = l.split(" ").map(Number);
+  const levels = l.split(" ").map(Number);
 
   // Start with an easy filter or two to help debug initial incorrect solution
   let zeroCount = 0;
   let tooLargeCount = 0;
   for (let i = 0; i < levels.length - 1; i++) {
-    let diff = Math.abs(levels[i] - levels[i + 1]);
+    const diff = Math.abs(levels[i] - levels[i + 1]);
     if (diff === 0) {
       zeroCount++;
     }
@@ -94,12 +94,12 @@ function reportLineIsSafe(l: string): boolean {
     }
   }
 
-  let [safe, firstSkippedLevel] = reportIsSafe(levels);
+  const [safe, firstSkippedLevel] = reportIsSafe(levels);
   if (!safe) {
-    let levelsReduced0 = levels
+    const levelsReduced0 = levels
       .slice(0, firstSkippedLevel)
       .concat(levels.slice(firstSkippedLevel + 1, levels.length));
-    let levelsReduced1 = levels
+    const levelsReduced1 = levels
       .slice(0, firstSkippedLevel + 1)
       .concat(levels.slice(firstSkippedLevel + 2, levels.length));
     logger.debug(
@@ -111,8 +111,8 @@ function reportLineIsSafe(l: string): boolean {
       },
       "One unsafe"
     );
-    let [safe0, secondSkippedLevel0] = reportIsSafe(levelsReduced0);
-    let [safe1, secondSkippedLevel1] = reportIsSafe(levelsReduced1);
+    const [safe0, secondSkippedLevel0] = reportIsSafe(levelsReduced0);
+    const [safe1, secondSkippedLevel1] = reportIsSafe(levelsReduced1);
     if (!(safe0 || safe1)) {
       logger.debug(
         {
@@ -126,7 +126,7 @@ function reportLineIsSafe(l: string): boolean {
       // I don't love this, but it catches a special case I'm struggling to reason about
       // more abstractly. It catches a direction issue with the first level.
       if (firstSkippedLevel === 1) {
-        let [safe2, thirdSkippedLevel] = reportIsSafe(
+        const [safe2, thirdSkippedLevel] = reportIsSafe(
           levels.slice(1, levels.length)
         );
         if (safe2) {

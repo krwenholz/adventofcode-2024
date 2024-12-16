@@ -23,7 +23,7 @@ const xmas = ["X", "M", "A", "S"];
 
 function isXmas(row: number, col: number, grid: string[], direction: number[]): boolean {
 
-  for (let letter of xmas) {
+  for (const letter of xmas) {
     const next = getPosition(row, col, grid);
     if (next !== letter) {
       return false;
@@ -37,7 +37,7 @@ function isXmas(row: number, col: number, grid: string[], direction: number[]): 
 
 function hasXmas(startRow: number, startCol: number, grid: string[]): number {
   let count = 0;
-  for (let direction of Directions) {
+  for (const direction of Directions) {
     if (isXmas(startRow, startCol, grid, direction)) {
       count++;
     }

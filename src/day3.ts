@@ -3,7 +3,7 @@ import { logger } from "./logger";
 
 export function partOne(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const lines = fileContents.split("\n");
   const expected = lines[0];
   logger.info(`Running day 3 part one with ${lines.length} lines and expected ${expected}`);
   const instructions = lines.slice(2);

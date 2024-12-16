@@ -40,7 +40,8 @@
         "esbenp.prettier-vscode",
         "mkhl.direnv",
         "streetsidesoftware.code-spell-checker",
-        "redhat.vscode-yaml"
+        "redhat.vscode-yaml",
+        "dbaeumer.vscode-eslint"
       ]
     }
   },

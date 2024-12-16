@@ -12,14 +12,14 @@ function isValidUpdate(pages: number[], rules: Map<number, Rule[]>): boolean {
     logger.debug({ pages: pages, 29: rules.get(29) }, "Checking page");
   }
   const seenSoFar = new Set<number>();
-  for (let page of pages) {
+  for (const page of pages) {
     const pageRules = rules.get(page);
     if (!pageRules) {
       continue;
     }
 
-    for (let rule of pageRules) {
-      for (let seen of seenSoFar) {
+    for (const rule of pageRules) {
+      for (const seen of seenSoFar) {
         if (rule.before === page && rule.after === seen) {
           return false;
         }
@@ -46,9 +46,9 @@ export function partOne(filePath: string): number {
     }
   });
 
-  let rules = new Map<number, Rule[]>();
+  const rules = new Map<number, Rule[]>();
   lines.slice(0, splitIdx).forEach((line) => {
-    let [beforeTxt, afterTxt] = line.split("|");
+    const [beforeTxt, afterTxt] = line.split("|");
     const before = parseInt(beforeTxt);
     const after = parseInt(afterTxt);
 
@@ -68,7 +68,7 @@ export function partOne(filePath: string): number {
   });
 
   const medians: number[] = [0];
-  for (let update of updates) {
+  for (const update of updates) {
     if (isValidUpdate(update, rules)) {
       medians.push(update[Math.floor(update.length / 2)]);
       logger.debug(
