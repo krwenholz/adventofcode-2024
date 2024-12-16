@@ -1,6 +1,6 @@
-import * as fs from "fs";
-import { logger } from "./logger";
-import { getPosition, getPositionSplit } from "./util";
+import * as fs from 'fs';
+import { logger } from './logger';
+import { getPosition, getPositionSplit } from './util';
 
 const Directions = [
   [-1, 0], // up, starting position
@@ -10,8 +10,8 @@ const Directions = [
 ];
 
 export function partOne(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  const lines = fileContents.split('\n');
   const expected = lines[0];
   const grid = lines.slice(2);
 
@@ -19,7 +19,7 @@ export function partOne(filePath: string): number {
   let col = 0;
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] === "^") {
+      if (grid[i][j] === '^') {
         row = i;
         col = j;
         break;
@@ -37,31 +37,31 @@ export function partOne(filePath: string): number {
     const nextRow = row + dir[0];
     const nextCol = col + dir[1];
     symbol = getPosition(nextRow, nextCol, grid);
-    if (symbol === "#") {
+    if (isBlock(symbol)) {
       dir = Directions[(Directions.indexOf(dir) + 1) % 4];
     } else {
       row = nextRow;
       col = nextCol;
     }
 
-    if (symbol === ".") {
+    if (symbol === '.') {
       positions.add(`${row},${col}`);
     }
   }
 
   let total = 0;
-  positions.forEach((value) => {
+  positions.forEach(() => {
     total++;
   });
 
-  logger.info({ value: total, expected: expected }, "Day 6 part one");
+  logger.info({ value: total, expected: expected }, 'Day 6 part one');
   return total;
 }
 
 function findStart(grid: string[][]): [number, number] {
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] === "^") {
+      if (grid[i][j] === '^') {
         return [i, j];
       }
     }
@@ -69,42 +69,60 @@ function findStart(grid: string[][]): [number, number] {
   return [-1, -1];
 }
 
-function findBlocks(grid: string[][]): Map<number, Set<number>> {
-  const blocks = new Map<number, Set<number>>();
+function findBlocks(grid: string[][]): [Set<number>, Set<number>] {
+  const rowBlocks = new Set<number>();
+  const colBlocks = new Set<number>();
   for (let i = 0; i < grid.length; i++) {
     for (let j = 0; j < grid[i].length; j++) {
-      if (grid[i][j] === "#") {
-        blocks.get(i) ? blocks.get(i)?.add(j) : blocks.set(i, new Set<number>([j]));
+      if (isBlock(grid[i][j])) {
+        rowBlocks.add(i);
+        colBlocks.add(j);
       }
     }
   }
-  return blocks;
+  return [rowBlocks, colBlocks];
 }
 
 /**
- * @param row 
- * @param col 
- * @param grid 
+ * @param row
+ * @param col
+ * @param grid
  * @returns a map of positions and whether the path is cyclic
  */
-function tracePath(row: number, col: number, dir: number[], grid: string[][], positions: Map<string, Set<string>>): [Map<string, Set<string>>, boolean] {
+function tracePath(
+  row: number,
+  col: number,
+  dir: number[],
+  grid: string[][],
+  positions: Map<string, Set<string>>,
+): [Map<string, Set<string>>, boolean] {
   let symbol = getPositionSplit(row, col, grid);
   while (symbol) {
     const nextRow = row + dir[0];
     const nextCol = col + dir[1];
     symbol = getPositionSplit(nextRow, nextCol, grid);
-    if (symbol === "#") {
+    if (isBlock(symbol)) {
       dir = Directions[(Directions.indexOf(dir) + 1) % 4];
     } else {
       row = nextRow;
       col = nextCol;
     }
 
-    if (symbol === ".") {
-      let dirs = positions.get(`${row},${col}`) || new Set<string>();
+    if (symbol === '.') {
+      const dirs = positions.get(`${row},${col}`) || new Set<string>();
 
       if (dirs.has(`${dir}`)) {
-        logger.debug({ row, col, dir }, "Cycle detected");
+        logger.debug(
+          {
+            dirs: dirs.values().reduce((acc, v) => {
+              return acc + ',' + v;
+            }, ''),
+            dir,
+            row,
+            col,
+          },
+          'Cyclic path detected',
+        );
         return [positions, true];
       }
 
@@ -117,19 +135,26 @@ function tracePath(row: number, col: number, dir: number[], grid: string[][], po
 }
 
 function placeBlock(row: number, col: number, grid: string[][]): string[][] {
-  let newGrid = grid.map((line) => line.slice());
-  newGrid[row][col] = "#";
+  const newGrid = grid.map(line => line.slice());
+  if (!getPositionSplit(row, col, newGrid)) {
+    return newGrid;
+  }
+  newGrid[row][col] = 'O';
   return newGrid;
 }
 
-export function partTwo(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
-  const expected = lines[1];
-  const grid = lines.slice(2).map((line) => line.split(""));
+function isBlock(s: string): boolean {
+  return ['#', 'O'].includes(s);
+}
 
-  let [startRow, startCol] = findStart(grid);
-  const blocks = findBlocks(grid);
+export function partTwo(filePath: string): number {
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  const lines = fileContents.split('\n');
+  const expected = lines[1];
+  const grid = lines.slice(2).map(line => line.split(''));
+
+  const [startRow, startCol] = findStart(grid);
+  const [rowBlocks, colBlocks] = findBlocks(grid);
   /**
    * To create cycles, we want to run the path into a block.
    * This means terminating a path early.
@@ -140,7 +165,9 @@ export function partTwo(filePath: string): number {
    * What is a cyclic path? A path which crosses itself in the _same_ direction.
    */
   let dir = Directions[0];
-  let positions = new Map<string, Set<string>>([[`${startRow},${startCol}`, new Set<string>(`${dir}`)]]);
+  const positions = new Map<string, Set<string>>([
+    [`${startRow},${startCol}`, new Set<string>(`${dir}`)],
+  ]);
   let symbol = getPositionSplit(startRow, startCol, grid);
   let row = startRow;
   let col = startCol;
@@ -152,16 +179,41 @@ export function partTwo(filePath: string): number {
 
     nextRow = row + dir[0];
     nextCol = col + dir[1];
-    if (blocks.get(nextRow)?.has(nextCol)) {
-      logger.debug({ row, col, dir }, "Placing a block to cut off the path");
+    if (
+      (rowBlocks.has(nextRow) || colBlocks.has(nextCol)) &&
+      !positions.has(`${nextRow},${nextCol}`) &&
+      getPositionSplit(nextRow, nextCol, grid) === '.'
+    ) {
       const newGrid = placeBlock(nextRow, nextCol, grid);
-      let [_, isCyclic] = tracePath(row, col, dir, newGrid, new Map<string, Set<string>>(positions));
+      logger.debug({ row, col, dir }, 'Placing a block to cut off the path');
+      const [, isCyclic] = tracePath(
+        row,
+        col,
+        dir,
+        newGrid,
+        new Map<string, Set<string>>(positions),
+      );
       if (isCyclic) {
+        logger.debug(
+          { nextRow, nextCol, dir },
+          'Cyclic path detected with new block',
+        );
+        console.log(newGrid.map(line => line.join('')).join('\n'));
+        logger.debug(
+          {
+            poss: positions.entries().reduce((acc, [k, v]) => {
+              return `${k}:${[...v.values()].join(',')}, ${acc}`;
+            }, ''),
+          },
+          'positions',
+        );
         cycleCreatingBlockCount++;
+        //TODO: remove
+        return cycleCreatingBlockCount;
       }
     }
 
-    if (symbol === "#") {
+    if (isBlock(symbol)) {
       dir = Directions[(Directions.indexOf(dir) + 1) % 4];
       continue;
     } else {
@@ -169,13 +221,26 @@ export function partTwo(filePath: string): number {
       col = nextCol;
     }
 
-    if (symbol === ".") {
-      let dirs = positions.get(`${row},${col}`) || new Set<string>();
+    if (symbol === '.') {
+      const dirs = positions.get(`${row},${col}`) || new Set<string>();
       dirs.add(`${dir}`);
       positions.set(`${row},${col}`, dirs);
+      if (row === 3 && col === 4) {
+        logger.debug(
+          {
+            poss: positions.entries().reduce((acc, [k, v]) => {
+              return `${k}:${[...v.values()].join(',')}, ${acc}`;
+            }, ''),
+          },
+          'positions',
+        );
+      }
     }
   }
 
-  logger.info({ cycleCreatingBlockCount, expected: expected }, "Day 6 part two");
+  logger.info(
+    { cycleCreatingBlockCount, expected: expected },
+    'Day 6 part two',
+  );
   return cycleCreatingBlockCount;
 }
