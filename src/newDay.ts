@@ -1,5 +1,5 @@
-import * as fs from "fs";
-import { logger } from "./logger";
+import * as fs from 'fs';
+import { logger } from './logger';
 
 export function newDay(dayNumber: number): void {
   const template = `
@@ -24,7 +24,7 @@ export function partTwo(filePath: string): number {
   let lines = fileContents.split("\\n");
   const expected = lines[1];
   lines = lines.slice(2);
-  logger.info(\`Running day ${dayNumber} part two with \${lines.length} lines\ and expected \${expected}\`);
+  logger.info(\`Running day ${dayNumber} part two with \${lines.length} lines and expected \${expected}\`);
 
   // TODO: Implement part two logic
 

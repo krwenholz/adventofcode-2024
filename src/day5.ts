@@ -1,6 +1,5 @@
-import * as fs from "fs";
-import { logger } from "./logger";
-import { kMaxLength } from "buffer";
+import * as fs from 'fs';
+import { logger } from './logger';
 
 type Rule = {
   before: number;
@@ -9,7 +8,7 @@ type Rule = {
 
 function isValidUpdate(pages: number[], rules: Map<number, Rule[]>): boolean {
   if (pages[0] === 61) {
-    logger.debug({ pages: pages, 29: rules.get(29) }, "Checking page");
+    logger.debug({ pages: pages, 29: rules.get(29) }, 'Checking page');
   }
   const seenSoFar = new Set<number>();
   for (const page of pages) {
@@ -32,23 +31,23 @@ function isValidUpdate(pages: number[], rules: Map<number, Rule[]>): boolean {
 }
 
 export function partOne(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[0];
   lines = lines.slice(2);
   logger.info(
-    `Running day 5 part one with ${lines.length} lines and expected ${expected}`
+    `Running day 5 part one with ${lines.length} lines and expected ${expected}`,
   );
 
-  const splitIdx = lines.findIndex((line) => {
+  const splitIdx = lines.findIndex(line => {
     if (!line) {
       return true;
     }
   });
 
   const rules = new Map<number, Rule[]>();
-  lines.slice(0, splitIdx).forEach((line) => {
-    const [beforeTxt, afterTxt] = line.split("|");
+  lines.slice(0, splitIdx).forEach(line => {
+    const [beforeTxt, afterTxt] = line.split('|');
     const before = parseInt(beforeTxt);
     const after = parseInt(afterTxt);
 
@@ -63,8 +62,8 @@ export function partOne(filePath: string): number {
     rules.get(after)?.push({ before: before, after: after });
   });
 
-  const updates = lines.slice(splitIdx + 1).map((line) => {
-    return line.split(",").map((page) => parseInt(page));
+  const updates = lines.slice(splitIdx + 1).map(line => {
+    return line.split(',').map(page => parseInt(page));
   });
 
   const medians: number[] = [0];
@@ -73,28 +72,28 @@ export function partOne(filePath: string): number {
       medians.push(update[Math.floor(update.length / 2)]);
       logger.debug(
         { update: update, median: update[Math.floor(update.length / 2)] },
-        "Valid update"
+        'Valid update',
       );
     }
   }
 
   const answer = medians.reduce((acc, val) => acc + val, 0);
 
-  logger.info({ value: answer, expected: expected }, "Day 5 part one");
+  logger.info({ value: answer, expected: expected }, 'Day 5 part one');
   return answer;
 }
 
 export function partTwo(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[1];
   lines = lines.slice(2);
   logger.info(
-    `Running day 5 part two with ${lines.length} lines and expected ${expected}`
+    `Running day 5 part two with ${lines.length} lines and expected ${expected}`,
   );
 
   // TODO: Implement part two logic
 
-  logger.info({ value: "", expected: expected }, "Day 5 part two");
+  logger.info({ value: '', expected: expected }, 'Day 5 part two');
   return NaN;
 }

@@ -1,11 +1,13 @@
-import * as fs from "fs";
-import { logger } from "./logger";
+import * as fs from 'fs';
+import { logger } from './logger';
 
 export function partOne(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  const lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  const lines = fileContents.split('\n');
   const expected = lines[0];
-  logger.info(`Running day 3 part one with ${lines.length} lines and expected ${expected}`);
+  logger.info(
+    `Running day 3 part one with ${lines.length} lines and expected ${expected}`,
+  );
   const instructions = lines.slice(2);
 
   let acc = 0;
@@ -22,25 +24,29 @@ export function partOne(filePath: string): number {
     }
   }
 
-  logger.info({ value: acc, expected: expected }, "Day 3 part one");
+  logger.info({ value: acc, expected: expected }, 'Day 3 part one');
   return acc;
 }
 
 export function partTwo(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[1];
   lines = lines.slice(2);
-  logger.info(`Running day 3 part two with ${lines.length} lines and expected ${expected}`);
+  logger.info(
+    `Running day 3 part two with ${lines.length} lines and expected ${expected}`,
+  );
 
   let mulEnabled = true;
   let acc = 0;
   for (let i = 0; i < lines.length; i++) {
     const instructionLine = lines[i];
-    const matches = instructionLine.matchAll(/((?<do>do\(\))|mul\((?<firstNum>\d+),(?<secondNum>\d+)\)|(?<dont>don't\(\)))/g);
+    const matches = instructionLine.matchAll(
+      /((?<do>do\(\))|mul\((?<firstNum>\d+),(?<secondNum>\d+)\)|(?<dont>don't\(\)))/g,
+    );
     let match = matches.next();
     for (; !match.done; match = matches.next()) {
-      logger.debug({ match, mulEnabled }, "match");
+      logger.debug({ match, mulEnabled }, 'match');
 
       // do
       if (match.value[2]) {
@@ -62,7 +68,6 @@ export function partTwo(filePath: string): number {
     }
   }
 
-
-  logger.info({ value: acc, expected: expected }, "Day 3 part two");
+  logger.info({ value: acc, expected: expected }, 'Day 3 part two');
   return acc;
 }

@@ -1,19 +1,19 @@
-import * as fs from "fs";
-import { logger } from "./logger";
+import * as fs from 'fs';
+import { logger } from './logger';
 
 export function partOne(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[0];
   lines = lines.slice(2);
   logger.info(
-    `Running day 1 part one with ${lines.length} lines and expected ${expected}`
+    `Running day 1 part one with ${lines.length} lines and expected ${expected}`,
   );
 
   const lList: number[] = [];
   const rList: number[] = [];
-  lines.forEach((l) => {
-    const nums = l.split("   ");
+  lines.forEach(l => {
+    const nums = l.split('   ');
     lList.push(Number(nums[0]));
     rList.push(Number(nums[1]));
   });
@@ -26,23 +26,23 @@ export function partOne(filePath: string): number {
     acc += Math.abs(lList[i] - rList[i]);
   }
 
-  logger.info({ value: acc, expected: expected }, "Day 1 part one");
+  logger.info({ value: acc, expected: expected }, 'Day 1 part one');
   return acc;
 }
 
 export function partTwo(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[1];
   lines = lines.slice(2);
   logger.info(
-    `Running day 1 part two with ${lines.length} lines and expected ${expected}`
+    `Running day 1 part two with ${lines.length} lines and expected ${expected}`,
   );
 
   const lList: number[] = [];
   const rListCount: Map<number, number> = new Map();
-  lines.forEach((l) => {
-    const nums = l.split("   ").map(Number);
+  lines.forEach(l => {
+    const nums = l.split('   ').map(Number);
     lList.push(nums[0]);
     rListCount.set(nums[1], (rListCount.get(nums[1]) ?? 0) + 1);
   });
@@ -54,6 +54,6 @@ export function partTwo(filePath: string): number {
     acc += Math.abs(lList[i] * (rListCount.get(lList[i]) ?? 0));
   }
 
-  logger.info({ value: acc, expected: expected }, "Day 1 part two");
+  logger.info({ value: acc, expected: expected }, 'Day 1 part two');
   return acc;
 }

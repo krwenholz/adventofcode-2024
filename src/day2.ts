@@ -1,19 +1,18 @@
-import * as fs from "fs";
-import { logger } from "./logger";
-import { report } from "process";
+import * as fs from 'fs';
+import { logger } from './logger';
 
 export function partOne(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[0];
   lines = lines.slice(2);
   logger.info(
-    `Running day 2 part one with ${lines.length} lines and expected ${expected}`
+    `Running day 2 part one with ${lines.length} lines and expected ${expected}`,
   );
 
   let safeCount = 0;
-  lines.forEach((l) => {
-    const reports = l.split(" ").map(Number);
+  lines.forEach(l => {
+    const reports = l.split(' ').map(Number);
 
     const increasing = reports[0] < reports[1];
     let safe = true;
@@ -36,7 +35,7 @@ export function partOne(filePath: string): number {
     }
   });
 
-  logger.info({ value: safeCount, expected: expected }, "Day 2 part one");
+  logger.info({ value: safeCount, expected: expected }, 'Day 2 part one');
   return safeCount;
 }
 
@@ -67,7 +66,7 @@ function reportIsSafe(report: number[]): [boolean, number] {
 }
 
 function reportLineIsSafe(l: string): boolean {
-  const levels = l.split(" ").map(Number);
+  const levels = l.split(' ').map(Number);
 
   // Start with an easy filter or two to help debug initial incorrect solution
   let zeroCount = 0;
@@ -87,8 +86,8 @@ function reportLineIsSafe(l: string): boolean {
       (zeroCount > 0 && tooLargeCount > 0)
     ) {
       logger.debug(
-        { levels: levels.join(" "), zeroCount, tooLargeCount },
-        "Diff count too large, unsafe"
+        { levels: levels.join(' '), zeroCount, tooLargeCount },
+        'Diff count too large, unsafe',
       );
       return false;
     }
@@ -104,33 +103,31 @@ function reportLineIsSafe(l: string): boolean {
       .concat(levels.slice(firstSkippedLevel + 2, levels.length));
     logger.debug(
       {
-        levels: levels.join(" "),
+        levels: levels.join(' '),
         levelsReduced0,
         levelsReduced1,
         firstSkippedLevel,
       },
-      "One unsafe"
+      'One unsafe',
     );
     const [safe0, secondSkippedLevel0] = reportIsSafe(levelsReduced0);
     const [safe1, secondSkippedLevel1] = reportIsSafe(levelsReduced1);
     if (!(safe0 || safe1)) {
       logger.debug(
         {
-          levels: levels.join(" "),
+          levels: levels.join(' '),
           firstSkippedLevel,
           secondSkippedLevel0,
           secondSkippedLevel1,
         },
-        "Second unsafe"
+        'Second unsafe',
       );
       // I don't love this, but it catches a special case I'm struggling to reason about
       // more abstractly. It catches a direction issue with the first level.
       if (firstSkippedLevel === 1) {
-        const [safe2, thirdSkippedLevel] = reportIsSafe(
-          levels.slice(1, levels.length)
-        );
+        const [safe2] = reportIsSafe(levels.slice(1, levels.length));
         if (safe2) {
-          logger.debug({ levels: levels.join(" ") }, "Safe with skipped first");
+          logger.debug({ levels: levels.join(' ') }, 'Safe with skipped first');
           return true;
         }
       }
@@ -139,26 +136,26 @@ function reportLineIsSafe(l: string): boolean {
     return true;
   }
 
-  logger.trace({ l, skippedLevel: firstSkippedLevel }, "Safe");
+  logger.trace({ l, skippedLevel: firstSkippedLevel }, 'Safe');
   return true;
 }
 
 export function partTwo(filePath: string): number {
-  const fileContents = fs.readFileSync(filePath, "utf-8");
-  let lines = fileContents.split("\n");
+  const fileContents = fs.readFileSync(filePath, 'utf-8');
+  let lines = fileContents.split('\n');
   const expected = lines[1];
   lines = lines.slice(2);
   logger.info(
-    `Running day 2 part two with ${lines.length} lines and expected ${expected}`
+    `Running day 2 part two with ${lines.length} lines and expected ${expected}`,
   );
 
   let safeCount = 0;
-  lines.forEach((l) => {
+  lines.forEach(l => {
     if (reportLineIsSafe(l)) {
       safeCount++;
     }
   });
 
-  logger.info({ value: safeCount, expected: expected }, "Day 2 part two");
+  logger.info({ value: safeCount, expected: expected }, 'Day 2 part two');
   return safeCount;
 }
