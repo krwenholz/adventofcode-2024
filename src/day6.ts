@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import { logger } from './logger';
-import { getPosition, getPositionSplit } from './util';
+import { getPosition } from './util/util';
 
 const Directions = [
   [-1, 0], // up, starting position
@@ -96,11 +96,11 @@ function tracePath(
   grid: string[][],
   positions: Map<string, Set<string>>,
 ): [Map<string, Set<string>>, boolean] {
-  let symbol = getPositionSplit(row, col, grid);
+  let symbol = getPosition(row, col, grid);
   while (symbol) {
     const nextRow = row + dir[0];
     const nextCol = col + dir[1];
-    symbol = getPositionSplit(nextRow, nextCol, grid);
+    symbol = getPosition(nextRow, nextCol, grid);
     if (isBlock(symbol)) {
       dir = Directions[(Directions.indexOf(dir) + 1) % 4];
     } else {
@@ -125,7 +125,7 @@ function tracePath(
 
 function placeBlock(row: number, col: number, grid: string[][]): string[][] {
   const newGrid = grid.map(line => line.slice());
-  if (!getPositionSplit(row, col, newGrid)) {
+  if (!getPosition(row, col, newGrid)) {
     return newGrid;
   }
   newGrid[row][col] = 'O';
@@ -157,21 +157,21 @@ export function partTwo(filePath: string): number {
   const positions = new Map<string, Set<string>>([
     [`${startRow},${startCol}`, new Set<string>(`${dir}`)],
   ]);
-  let symbol = getPositionSplit(startRow, startCol, grid);
+  let symbol = getPosition(startRow, startCol, grid);
   let row = startRow;
   let col = startCol;
   let cycleCreatingBlockCount = 0;
   while (symbol) {
     let nextRow = row + dir[0];
     let nextCol = col + dir[1];
-    symbol = getPositionSplit(nextRow, nextCol, grid);
+    symbol = getPosition(nextRow, nextCol, grid);
 
     nextRow = row + dir[0];
     nextCol = col + dir[1];
     if (
       (rowBlocks.has(nextRow) || colBlocks.has(nextCol)) &&
       !positions.has(`${nextRow},${nextCol}`) &&
-      getPositionSplit(nextRow, nextCol, grid) === '.'
+      getPosition(nextRow, nextCol, grid) === '.'
     ) {
       const newGrid = placeBlock(nextRow, nextCol, grid);
       logger.debug({ row, col, dir }, 'Placing a block to cut off the path');
