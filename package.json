@@ -4,21 +4,23 @@
   "type": "module",
   "scripts": {
     "newDay": "index.ts",
-    "test": "vitest",
-    "coverage": "vitest run --coverage"
+    "test": "vitest --config ./vitest.config.ts",
+    "coverage": "vitest run  --config ./vitest.config.ts --coverage"
   },
   "devDependencies": {
     "@eslint/js": "^9.17.0",
     "@types/bun": "latest",
-    "@vitest/coverage-v8": "2.1.8",
-    "globals": "^15.13.0",
-    "typescript-eslint": "^8.18.1",
-    "vitest": "^2.1.8",
-    "eslint": "^9.17.0",
     "@typescript-eslint/eslint-plugin": "^8.18.1",
     "@typescript-eslint/parser": "^8.18.1",
+    "@vitest/coverage-v8": "2.1.8",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.2.1",
-    "eslint-config-prettier": "^9.1.0"
+    "globals": "^15.13.0",
+    "pino-pretty": "^13.0.0",
+    "ts-node": "^10.9.2",
+    "typescript-eslint": "^8.18.1",
+    "vitest": "^2.1.8"
   },
   "peerDependencies": {
     "typescript": "^5.0.0"
@@ -26,8 +28,7 @@
   "dependencies": {
     "commander": "^12.1.0",
     "pino": "^9.5.0",
-    "pino-pretty": "^13.0.0",
-    "prettier": "^3.4.2",
-    "ts-node": "^10.9.2"
+    "pino-caller": "^3.4.0",
+    "prettier": "^3.4.2"
   }
 }
