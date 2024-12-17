@@ -4,7 +4,7 @@ import fs from 'fs';
 fs.readdirSync('./inputs').forEach(file => {
   const day = file.match(/day(\d+)/)?.[1];
   const name = file.match(/day\d+\.(\w+)\.txt/)?.[1];
-  describe(`data driven day ${day}:${name}`, () => {
+  describe(`data_driven ${day}.${name}`, () => {
     if (!name) {
       test(`skipping ${file}`, () => {});
       return;
