@@ -1,23 +1,19 @@
 import * as fs from 'fs';
 import { logger } from './logger';
 
-function canEval(val: number, nums: number[], ops: string[]): boolean {
-  if (ops.length === nums.length - 1) {
-    let sum = nums[0];
-    for (let i = 0; i < ops.length; i++) {
-      switch (ops[i]) {
-        case '+':
-          sum += nums[i + 1];
-          break;
-        case '*':
-          sum *= nums[i + 1];
-          break;
-      }
-    }
-    return sum === val;
+function canEval(val: number, nums: number[], acc: number): boolean {
+  if (nums.length === 0) {
+    return val === acc;
   }
 
-  return canEval(val, nums, [...ops, '+']) || canEval(val, nums, [...ops, '*']);
+  if (val < acc) {
+    return false;
+  }
+
+  return (
+    canEval(val, nums.slice(1), acc + nums[0]) ||
+    canEval(val, nums.slice(1), acc * nums[0])
+  );
 }
 
 export function partOne(filePath: string): number {
@@ -34,7 +30,7 @@ export function partOne(filePath: string): number {
     let [valStr, numsStr] = l.split(': ');
     const val = Number(valStr);
     const nums = numsStr.split(' ').map(Number);
-    if (canEval(val, nums, [])) {
+    if (canEval(val, nums.slice(1), nums[0])) {
       sum += val;
     }
   }
