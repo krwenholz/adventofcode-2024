@@ -27,8 +27,8 @@ export function partOne(filePath: string): number {
   );
 
   let sum = 0;
-  for (let l of lines) {
-    let [valStr, numsStr] = l.split(': ');
+  for (const l of lines) {
+    const [valStr, numsStr] = l.split(': ');
     const val = Number(valStr);
     const nums = numsStr.split(' ').map(Number);
     if (canEval(val, nums.slice(1), nums[0])) {
@@ -69,8 +69,8 @@ export function partTwo(filePath: string): number {
   );
 
   let sum = 0;
-  for (let l of lines) {
-    let [valStr, numsStr] = l.split(': ');
+  for (const l of lines) {
+    const [valStr, numsStr] = l.split(': ');
     const val = Number(valStr);
     const nums = numsStr.split(' ').map(Number);
     if (canEvalTwo(val, nums.slice(1), nums[0])) {
