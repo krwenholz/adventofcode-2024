@@ -79,8 +79,64 @@ export function partTwo(filePath: string): number {
     `Running day 8 part two with ${lines.length} lines and expected ${expected}`,
   );
 
-  // TODO: Implement part two logic
+  const rows = lines.length;
+  const cols = lines[0].length;
 
-  logger.info({ value: '', expected: expected }, 'Day 8 part two');
-  return NaN;
+  const stations = new Map<string, Station[]>();
+  const antinodes = new Set<string>();
+
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const frequency = lines[row][col];
+      if (!validFrequencies.test(frequency)) {
+        continue;
+      }
+
+      const curStation = { frequency, row, col };
+      if (!stations.has(curStation.frequency)) {
+        stations.set(curStation.frequency, []);
+      }
+
+      for (let earlierStation of stations.get(curStation.frequency)!) {
+        // Add the stations, because we have two
+        antinodes.add(`${curStation.row},${curStation.col}`);
+        antinodes.add(`${earlierStation.row},${earlierStation.col}`);
+        // We know the earlier station has lower row and col values, so we can subtract the dx from the
+        // earlier station and add to this station
+        const rowDx = curStation.row - earlierStation.row;
+        const colDx = curStation.col - earlierStation.col;
+
+        let leftRow = earlierStation.row - rowDx;
+        let leftCol = earlierStation.col - colDx;
+        while (
+          leftRow >= 0 &&
+          leftRow < rows &&
+          leftCol >= 0 &&
+          leftCol < cols
+        ) {
+          antinodes.add(`${leftRow},${leftCol}`);
+          leftRow -= rowDx;
+          leftCol -= colDx;
+        }
+
+        let rightRow = curStation.row + rowDx;
+        let rightCol = curStation.col + colDx;
+        while (
+          rightRow >= 0 &&
+          rightRow < rows &&
+          rightCol >= 0 &&
+          rightCol < cols
+        ) {
+          antinodes.add(`${rightRow},${rightCol}`);
+          rightRow += rowDx;
+          rightCol += colDx;
+        }
+      }
+
+      stations.get(curStation.frequency)?.push(curStation);
+    }
+  }
+
+  logger.info({ value: antinodes.size, expected: expected }, 'Day 8 part two');
+  return antinodes.size;
 }
