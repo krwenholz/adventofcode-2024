@@ -13,11 +13,11 @@ export function partOne(filePath: string): number {
 
   const stones = lines[0].split(' ');
   let expandedCount = 0;
-  const memo = new Map<string, string[]>();
+  const memo = new Map<string, number>();
   for (const s of stones) {
     const expansion = expandStone(s, runCount, memo);
     logger.debug({ s, expansion }, 'Expansion');
-    expandedCount += expansion.length;
+    expandedCount += expansion;
   }
 
   logger.info({ expandedCount, expected: expected }, 'Day 11 part one');
@@ -27,17 +27,17 @@ export function partOne(filePath: string): number {
 function expandStone(
   s: string,
   runCount: number,
-  memo: Map<string, string[]>,
-): string[] {
+  memo: Map<string, number>,
+): number {
   const key = `${s}-${runCount}`;
   if (runCount === 0) {
-    memo.set(key, [s]);
+    memo.set(key, 1);
   }
   if (memo.has(key)) {
-    return memo.get(key) || [];
+    return memo.get(key) || 0;
   }
 
-  let acc: string[] = [];
+  let acc = 0;
   [s]
     .flatMap(stone => {
       if (stone === '0') {
@@ -58,7 +58,7 @@ function expandStone(
       return [`${parseInt(stone) * 2024}`];
     })
     .forEach(stone => {
-      acc = acc.concat(expandStone(stone, runCount - 1, memo));
+      acc += expandStone(stone, runCount - 1, memo);
     });
 
   memo.set(key, acc);
@@ -78,7 +78,9 @@ export function partTwo(filePath: string): number {
   let expandedCount = 0;
   const memo = new Map<string, number>();
   for (const s of stones) {
-    expandedCount += expandStone(s, 75, memo);
+    const expansion = expandStone(s, 75, memo);
+    logger.debug({ s, expansion }, 'Expansion');
+    expandedCount += expansion;
   }
 
   logger.info({ expandedCount, expected: expected }, 'Day 11 part two');
