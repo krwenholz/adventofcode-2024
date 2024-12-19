@@ -13,39 +13,56 @@ export function partOne(filePath: string): number {
 
   const stones = lines[0].split(' ');
   let expandedCount = 0;
+  const memo = new Map<string, string[]>();
   for (const s of stones) {
-    let expanded = [s];
-    for (let i = 0; i < runCount; i++) {
-      /**
-       * - If the stone is engraved with the number 0, it is replaced by a stone engraved with the number 1.
-       * - If the stone is engraved with a number that has an even number of digits, it is replaced by two stones. The left half of the digits are engraved on the new left stone, and the right half of the digits are engraved on the new right stone. (The new numbers don't keep extra leading zeroes: 1000 would become stones 10 and 0.)
-       * - If none of the other rules apply, the stone is replaced by a new stone; the old stone's number multiplied by 2024 is engraved on the new stone.
-       */
-      expanded = expanded.flatMap(s => {
-        if (s === '0') {
-          return ['1'];
-        }
-        if (s.length % 2 === 0) {
-          const midpoint = s.length / 2;
-          let secondHalf = s.slice(midpoint);
-          for (let j = 0; j < secondHalf.length; j++) {
-            const char = secondHalf[j];
-            if (char !== '0' || j === secondHalf.length - 1) {
-              secondHalf = secondHalf.slice(j);
-              break;
-            }
-          }
-          return [s.slice(0, midpoint), secondHalf];
-        }
-        return [`${parseInt(s) * 2024}`];
-      });
-    }
-    logger.debug({ s, expanded }, `finished expansion`);
-    expandedCount += expanded.length;
+    const expansion = expandStone(s, runCount, memo);
+    logger.debug({ s, expansion }, 'Expansion');
+    expandedCount += expansion.length;
   }
 
   logger.info({ expandedCount, expected: expected }, 'Day 11 part one');
   return expandedCount;
+}
+
+function expandStone(
+  s: string,
+  runCount: number,
+  memo: Map<string, string[]>,
+): string[] {
+  const key = `${s}-${runCount}`;
+  if (runCount === 0) {
+    memo.set(key, [s]);
+  }
+  if (memo.has(key)) {
+    return memo.get(key) || [];
+  }
+
+  let acc: string[] = [];
+  [s]
+    .flatMap(stone => {
+      if (stone === '0') {
+        return ['1'];
+      }
+      if (stone.length % 2 === 0) {
+        const midpoint = stone.length / 2;
+        let secondHalf = stone.slice(midpoint);
+        for (let j = 0; j < secondHalf.length; j++) {
+          const char = secondHalf[j];
+          if (char !== '0' || j === secondHalf.length - 1) {
+            secondHalf = secondHalf.slice(j);
+            break;
+          }
+        }
+        return [stone.slice(0, midpoint), secondHalf];
+      }
+      return [`${parseInt(stone) * 2024}`];
+    })
+    .forEach(stone => {
+      acc = acc.concat(expandStone(stone, runCount - 1, memo));
+    });
+
+  memo.set(key, acc);
+  return acc;
 }
 
 export function partTwo(filePath: string): number {
@@ -57,8 +74,13 @@ export function partTwo(filePath: string): number {
     `Running day 11 part two with ${lines.length} lines and expected ${expected}`,
   );
 
-  // TODO: Implement part two logic
+  const stones = lines[0].split(' ');
+  let expandedCount = 0;
+  const memo = new Map<string, number>();
+  for (const s of stones) {
+    expandedCount += expandStone(s, 75, memo);
+  }
 
-  logger.info({ value: '', expected: expected }, 'Day 11 part two');
-  return NaN;
+  logger.info({ expandedCount, expected: expected }, 'Day 11 part two');
+  return expandedCount;
 }
