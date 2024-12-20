@@ -11,7 +11,7 @@ fs.readdirSync('./inputs').forEach(file => {
   const partOneExpected = contents[0];
   const partTwoExpected = contents[1];
 
-  if (!name || partOneExpected === '???' || partTwoExpected === '???') {
+  if (!name || (partOneExpected === '???' && partTwoExpected === '???')) {
     return;
   }
 
