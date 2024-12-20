@@ -1,6 +1,12 @@
 import * as fs from 'fs';
 import { logger } from './logger';
-import { CardinalDirections } from './util/cardinal_directions';
+import {
+  CardinalDirections,
+  isOrthogonalDirection,
+  orthogonalDirections,
+  rotateDirectionNinetyClockwise,
+  rotateDirectionNinetyCounterclockwise,
+} from './util/cardinal_directions';
 import { getPosition } from './util/util';
 
 function findPrice(
@@ -68,42 +74,77 @@ export function partOne(filePath: string): number {
   return totalPrice;
 }
 
+function perimeterKey(row: number, col: number, direction: number[]): string {
+  return `${row},${col}->${direction.join(',')}`;
+}
+
 function findPricePartTwo(
-  row: number,
-  col: number,
+  startRow: number,
+  startCol: number,
   grid: string[],
   visited: Set<string>,
 ): [number, number] {
-  const key = `${row},${col}`;
-  if (visited.has(key)) {
-    return [0, 0];
-  }
+  let toVisit = [{ row: startRow, col: startCol }];
+  const knownPerimeters = new Set<string>();
 
-  visited.add(key);
-
-  const symbol = grid[row][col];
   let area = 0;
   let perimeter = 0;
-  for (const direction of CardinalDirections) {
-    const neighborRow = row + direction[0];
-    const neighborCol = col + direction[1];
-    const neighborSymbol = getPosition(neighborRow, neighborCol, grid);
-    if (neighborSymbol === undefined || neighborSymbol !== symbol) {
-      perimeter++;
+
+  while (toVisit.length > 0) {
+    const [{ row, col }] = toVisit.slice(0, 1);
+    toVisit = toVisit.slice(1);
+    const symbol = grid[row][col];
+
+    const key = `${row},${col}`;
+    if (visited.has(key)) {
       continue;
     }
 
-    const [nArea, nPerimeter] = findPricePartTwo(
-      neighborRow,
-      neighborCol,
-      grid,
-      visited,
-    );
-    area += nArea;
-    perimeter += nPerimeter;
+    visited.add(key);
+    area++;
+
+    for (const direction of CardinalDirections) {
+      const neighborRow = row + direction[0];
+      const neighborCol = col + direction[1];
+      const neighborSymbol = getPosition(neighborRow, neighborCol, grid);
+      if (neighborSymbol === undefined || neighborSymbol !== symbol) {
+        // Found a perimeter! Add it, regardless of if we count it.
+        knownPerimeters.add(perimeterKey(row, col, direction));
+        // In order to count the perimeter, we need to know it hasn't been reported by a neighbor
+        if (
+          orthogonalDirections(direction).every(orthogonalDir => {
+            return !knownPerimeters.has(
+              perimeterKey(
+                row + orthogonalDir[0],
+                col + orthogonalDir[1],
+                direction,
+              ),
+            );
+          })
+        ) {
+          logger.debug(
+            {
+              symbol,
+              row,
+              col,
+              direction,
+              knownPerimeters: Array.from(knownPerimeters),
+            },
+            'counting perimeter',
+          );
+          perimeter++;
+        }
+        continue;
+      }
+
+      toVisit.push({
+        row: neighborRow,
+        col: neighborCol,
+      });
+    }
   }
 
-  return [area + 1, perimeter];
+  return [area, perimeter];
 }
 
 export function partTwo(filePath: string): number {
@@ -129,6 +170,6 @@ export function partTwo(filePath: string): number {
     }
   }
 
-  logger.info({ value: '', expected: expected }, 'Day 12 part two');
-  return NaN;
+  logger.info({ totalPrice, expected: expected }, 'Day 12 part two');
+  return totalPrice;
 }
