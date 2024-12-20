@@ -1,12 +1,6 @@
 import * as fs from 'fs';
 import { logger } from './logger';
-import {
-  CardinalDirections,
-  isOrthogonalDirection,
-  orthogonalDirections,
-  rotateDirectionNinetyClockwise,
-  rotateDirectionNinetyCounterclockwise,
-} from './util/cardinal_directions';
+import { CardinalDirections } from './util/cardinal_directions';
 import { getPosition } from './util/util';
 
 function findPrice(
@@ -74,8 +68,76 @@ export function partOne(filePath: string): number {
   return totalPrice;
 }
 
-function perimeterKey(row: number, col: number, direction: number[]): string {
-  return `${row},${col}->${direction.join(',')}`;
+function cornerCount(
+  row: number,
+  col: number,
+  symbol: string,
+  grid: string[],
+): number {
+  let cornerCount = 0;
+  // Exterior corners
+  // north and east
+  if (
+    getPosition(row - 1, col, grid) !== symbol &&
+    getPosition(row, col + 1, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // east and south
+  if (
+    getPosition(row, col + 1, grid) !== symbol &&
+    getPosition(row + 1, col, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // south and west
+  if (
+    getPosition(row + 1, col, grid) !== symbol &&
+    getPosition(row, col - 1, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // west and north
+  if (
+    getPosition(row, col - 1, grid) !== symbol &&
+    getPosition(row - 1, col, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // TODO: Interior corners
+  // northeast opening
+  if (
+    getPosition(row - 1, col, grid) === symbol &&
+    getPosition(row, col + 1, grid) === symbol &&
+    getPosition(row - 1, col + 1, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // southeast opening
+  if (
+    getPosition(row + 1, col, grid) === symbol &&
+    getPosition(row, col + 1, grid) === symbol &&
+    getPosition(row + 1, col + 1, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // southwest opening
+  if (
+    getPosition(row + 1, col, grid) === symbol &&
+    getPosition(row, col - 1, grid) === symbol &&
+    getPosition(row + 1, col - 1, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  // northwest opening
+  if (
+    getPosition(row - 1, col, grid) === symbol &&
+    getPosition(row, col - 1, grid) === symbol &&
+    getPosition(row - 1, col - 1, grid) !== symbol
+  ) {
+    cornerCount++;
+  }
+  return cornerCount;
 }
 
 function findPricePartTwo(
@@ -85,10 +147,9 @@ function findPricePartTwo(
   visited: Set<string>,
 ): [number, number] {
   let toVisit = [{ row: startRow, col: startCol }];
-  const knownPerimeters = new Set<string>();
 
   let area = 0;
-  let perimeter = 0;
+  let corners = 0;
 
   while (toVisit.length > 0) {
     const [{ row, col }] = toVisit.slice(0, 1);
@@ -101,39 +162,15 @@ function findPricePartTwo(
     }
 
     visited.add(key);
+
     area++;
+    corners += cornerCount(row, col, symbol, grid);
 
     for (const direction of CardinalDirections) {
       const neighborRow = row + direction[0];
       const neighborCol = col + direction[1];
       const neighborSymbol = getPosition(neighborRow, neighborCol, grid);
       if (neighborSymbol === undefined || neighborSymbol !== symbol) {
-        // Found a perimeter! Add it, regardless of if we count it.
-        knownPerimeters.add(perimeterKey(row, col, direction));
-        // In order to count the perimeter, we need to know it hasn't been reported by a neighbor
-        if (
-          orthogonalDirections(direction).every(orthogonalDir => {
-            return !knownPerimeters.has(
-              perimeterKey(
-                row + orthogonalDir[0],
-                col + orthogonalDir[1],
-                direction,
-              ),
-            );
-          })
-        ) {
-          logger.debug(
-            {
-              symbol,
-              row,
-              col,
-              direction,
-              knownPerimeters: Array.from(knownPerimeters),
-            },
-            'counting perimeter',
-          );
-          perimeter++;
-        }
         continue;
       }
 
@@ -144,7 +181,7 @@ function findPricePartTwo(
     }
   }
 
-  return [area, perimeter];
+  return [area, corners];
 }
 
 export function partTwo(filePath: string): number {
