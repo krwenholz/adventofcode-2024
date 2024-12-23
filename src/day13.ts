@@ -164,60 +164,26 @@ export function partTwo(filePath: string): number {
       if (match) {
         const x = parseInt(match[1]) + 10000000000000;
         const y = parseInt(match[2]) + 10000000000000;
-        const memo = new Map<string, number>();
-        const prizeStack = [{ x, y }];
-        while (prizeStack.length > 0) {
-          const prize = prizeStack.pop()!;
-          const key = memoKey(buttonA, buttonB, prize);
-          logger.debug({ key, prize }, 'prize');
+        // Xa*a + Xb*b = x
+        // Ya*a + Yb*b = y
+        // Yb * ((Xa*a) + (Xb*b)) = Yb * (x)
+        // -Xb * ((Ya*a) + (Yb*b)) = -Xb * (y)
+        // Yb * ((Xa*a) + (Xb*b)) - Xb * ((Ya*a) + (Yb*b)) = Yb * (x) - Xb * (y)
+        // Yb*Xa*a + Yb*Xb*b - Xb*Ya*a - Xb*Yb*b = Yb*x - Xb*y
+        // (Yb*Xa - Xb*Ya)*a = Yb*x - Xb*y
+        // a = (Yb*x - Xb*y) / (Yb*Xa - Xb*Ya)
+        // b = (x - Xa*a) / Xb
+        const a =
+          (buttonB.dY * x - buttonB.dX * y) /
+          (buttonB.dY * buttonA.dX - buttonB.dX * buttonA.dY);
+        const b = (x - buttonA.dX * a) / buttonB.dX;
+        logger.debug({ a, b, x, y, buttonA, buttonB }, 'part two');
 
-          if (memo.has(key)) {
-            continue;
-          }
-
-          if (prize.x < 0 || prize.y < 0) {
-            memo.set(key, -1);
-            continue;
-          }
-
-          if (prize.x === 0 && prize.y === 0) {
-            memo.set(key, 0);
-            continue;
-          }
-
-          // Now either we've visited the buttons and have answers or we'll need to compute them
-          const buttonACost = memo.get(
-            memoKey(buttonA, buttonB, {
-              x: prize.x - buttonA.dX,
-              y: prize.y - buttonA.dY,
-            }),
-          )!;
-          const buttonBCost = memo.get(
-            memoKey(buttonA, buttonB, {
-              x: prize.x - buttonB.dX,
-              y: prize.y - buttonB.dY,
-            }),
-          )!;
-
-          if (buttonACost !== undefined || buttonBCost !== undefined) {
-            logger.debug(
-              { buttonACost, buttonBCost, buttonA, buttonB, prize },
-              'play',
-            );
-            memo.set(key, minCost(buttonACost, buttonBCost));
-            continue;
-          }
-
-          prizeStack.push(prize);
-          prizeStack.push({ x: prize.x - buttonA.dX, y: prize.y - buttonA.dY });
-          prizeStack.push({ x: prize.x - buttonB.dX, y: prize.y - buttonB.dY });
-        }
-
-        const cost = memo.get(memoKey(buttonA, buttonB, { x, y }))!;
-        if (cost === -1) {
+        if (Math.floor(a) !== a || Math.floor(b) !== b) {
           continue;
         }
-        totalCost += cost;
+
+        totalCost += a * 3 + b;
       }
     }
   }
