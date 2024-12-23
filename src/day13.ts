@@ -14,74 +14,32 @@ type Prize = {
 const BUTTON_REGEX = /Button [AB]: X\+(\d+), Y\+(\d+)/;
 const PRICE_REGEX = /Prize: X=(\d+), Y=(\d+)/;
 
-function memoKey(buttonA: Button, buttonB: Button, prize: Prize): string {
-  return `${buttonA.dX},${buttonA.dY},${buttonB.dX},${buttonB.dY},${prize.x},${prize.y}`;
-}
+function solve(buttonA: Button, buttonB: Button, { x, y }: Prize): number {
+  // Build some equations!
+  // Xa*a + Xb*b = x
+  // Ya*a + Yb*b = y
+  // Line them up!
+  // Yb * ((Xa*a) + (Xb*b)) = Yb * (x)
+  // -Xb * ((Ya*a) + (Yb*b)) = -Xb * (y)
+  // Add the equations!
+  // Yb * ((Xa*a) + (Xb*b)) - Xb * ((Ya*a) + (Yb*b)) = Yb * (x) - Xb * (y)
+  // Simplify!
+  // Yb*Xa*a + Yb*Xb*b - Xb*Ya*a - Xb*Yb*b = Yb*x - Xb*y
+  // (Yb*Xa - Xb*Ya)*a = Yb*x - Xb*y
+  // a = (Yb*x - Xb*y) / (Yb*Xa - Xb*Ya)
+  // Then substitute a back in to get b!
+  // b = (x - Xa*a) / Xb
+  const a =
+    (buttonB.dY * x - buttonB.dX * y) /
+    (buttonB.dY * buttonA.dX - buttonB.dX * buttonA.dY);
+  const b = (x - buttonA.dX * a) / buttonB.dX;
+  logger.debug({ a, b, x, y, buttonA, buttonB }, 'equations');
 
-function minCost(a: number, b: number): number {
-  if (a < 0) {
-    return b + 1;
-  }
-
-  if (b < 0) {
-    return a + 3;
-  }
-
-  return Math.min(a + 3, b + 1);
-}
-
-/**
- *
- * @param buttonA
- * @param buttonB
- * @param prize
- * @param memo
- * @returns -1 if the prize is unreachable, otherwise the total cost of presses
- */
-function play(
-  buttonA: Button,
-  buttonB: Button,
-  prize: Prize,
-  memo: Map<string, number>,
-  presses: number,
-): number {
-  const key = memoKey(buttonA, buttonB, prize);
-  if (memo.has(key)) {
-    return memo.get(key) || -1;
-  }
-
-  if (prize.x < 0 || prize.y < 0 || presses > 100) {
-    return -1;
-  }
-
-  if (prize.x === 0 && prize.y === 0) {
+  if (Math.floor(a) !== a || Math.floor(b) !== b) {
     return 0;
   }
 
-  const buttonACost = play(
-    buttonA,
-    buttonB,
-    { x: prize.x - buttonA.dX, y: prize.y - buttonA.dY },
-    memo,
-    presses + 1,
-  );
-
-  const buttonBCost = play(
-    buttonA,
-    buttonB,
-    { x: prize.x - buttonB.dX, y: prize.y - buttonB.dY },
-    memo,
-    presses + 1,
-  );
-
-  logger.debug({ buttonACost, buttonBCost, buttonA, buttonB, prize }, 'play');
-  if (buttonACost === -1 && buttonBCost === -1) {
-    memo.set(key, -1);
-    return -1;
-  }
-
-  memo.set(key, minCost(buttonACost, buttonBCost));
-  return memo.get(key) || -1;
+  return a * 3 + b;
 }
 
 export function partOne(filePath: string): number {
@@ -117,12 +75,8 @@ export function partOne(filePath: string): number {
       if (match) {
         const x = parseInt(match[1]);
         const y = parseInt(match[2]);
-        const cost = play(buttonA, buttonB, { x, y }, new Map(), 0);
-        if (cost === -1) {
-          continue;
-        }
 
-        totalCost += cost;
+        totalCost += solve(buttonA, buttonB, { x, y });
       }
     }
   }
@@ -164,26 +118,7 @@ export function partTwo(filePath: string): number {
       if (match) {
         const x = parseInt(match[1]) + 10000000000000;
         const y = parseInt(match[2]) + 10000000000000;
-        // Xa*a + Xb*b = x
-        // Ya*a + Yb*b = y
-        // Yb * ((Xa*a) + (Xb*b)) = Yb * (x)
-        // -Xb * ((Ya*a) + (Yb*b)) = -Xb * (y)
-        // Yb * ((Xa*a) + (Xb*b)) - Xb * ((Ya*a) + (Yb*b)) = Yb * (x) - Xb * (y)
-        // Yb*Xa*a + Yb*Xb*b - Xb*Ya*a - Xb*Yb*b = Yb*x - Xb*y
-        // (Yb*Xa - Xb*Ya)*a = Yb*x - Xb*y
-        // a = (Yb*x - Xb*y) / (Yb*Xa - Xb*Ya)
-        // b = (x - Xa*a) / Xb
-        const a =
-          (buttonB.dY * x - buttonB.dX * y) /
-          (buttonB.dY * buttonA.dX - buttonB.dX * buttonA.dY);
-        const b = (x - buttonA.dX * a) / buttonB.dX;
-        logger.debug({ a, b, x, y, buttonA, buttonB }, 'part two');
-
-        if (Math.floor(a) !== a || Math.floor(b) !== b) {
-          continue;
-        }
-
-        totalCost += a * 3 + b;
+        totalCost += solve(buttonA, buttonB, { x, y });
       }
     }
   }
