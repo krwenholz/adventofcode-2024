@@ -87,6 +87,27 @@ function debugGrid(
   });
 }
 
+function printGrid(
+  bots: Bot[],
+  gridRows: number,
+  gridCols: number,
+  time: number,
+) {
+  const out = [`Grid at ${time}:`];
+  const grid: string[][] = [];
+  for (let i = 0; i < gridRows; i++) {
+    grid.push('.'.repeat(gridCols).split(''));
+  }
+  for (const bot of bots) {
+    grid[bot.pos.row][bot.pos.col] = '*';
+  }
+  grid.forEach(row => {
+    out.push(row.join(''));
+  });
+
+  fs.appendFileSync('/tmp/day14.txt', out.join('\n') + '\n');
+}
+
 export function partOne(filePath: string): number {
   const fileContents = fs.readFileSync(filePath, 'utf-8');
   let lines = fileContents.split('\n');
@@ -142,7 +163,24 @@ export function partTwo(filePath: string): number {
     `Running day 14 part two with ${lines.length} lines and expected ${expected}`,
   );
 
-  // TODO: Implement part two logic
+  const [gridCols, gridRows] = lines[0].split(' ').map(Number);
+  const bots: Bot[] = lines.slice(1).map(line => {
+    return new Bot(line);
+  });
+  for (let i = 0; i < SIMULATION_SECONDS; i++) {
+    const occupiedSpaces = new Set<string>();
+    bots.forEach(bot => {
+      bot.pos.row += bot.vRow;
+      bot.pos.col += bot.vCol;
+      bot.wrap(gridRows, gridCols);
+      occupiedSpaces.add(bot.pos.toString());
+    });
+    if (occupiedSpaces.size !== bots.length) {
+      // not all bots are in unique positions, so this ain't a tree
+      continue;
+    }
+    printGrid(bots, gridRows, gridCols, i + 1);
+  }
 
   logger.info({ value: '', expected: expected }, 'Day 14 part two');
   return NaN;
