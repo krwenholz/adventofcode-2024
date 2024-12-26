@@ -12,3 +12,18 @@ export function isOrthogonalDirection(dir1: number[], dir2: number[]): boolean {
 export function orthogonalDirections(dir: number[]): number[][] {
   return CardinalDirections.filter(d => isOrthogonalDirection(dir, d));
 }
+
+export function directionFromSymbol(symbol: string): number[] {
+  switch (symbol) {
+    case '^':
+      return CardinalDirections[0];
+    case '>':
+      return CardinalDirections[1];
+    case 'v':
+      return CardinalDirections[2];
+    case '<':
+      return CardinalDirections[3];
+    default:
+      throw new Error(`Invalid symbol: ${symbol}`);
+  }
+}
